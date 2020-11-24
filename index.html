@@ -4,11 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Tic Tac Toe</title>
-    <link rel="stylesheet" href="public/stylesheets/tailwind.css" type="text/css" media="all">
+    <link rel="stylesheet" href="public/stylesheets/tailwind.css" type="text/css" media="all" />
   </head>
-  <body>
-    <h1 class="text-4xl font-bold">
-      Hello world
-    </h1>
+  <body class="bg-gray-200">
+    <header class="py-4 text-center bg-gray-700 shadow-md">
+      <h1 class="text-4xl font-semibold text-gray-100 sm:text-6xl">Tic Tac Toe</h1>
+    </header>
+    <main>
+      <div id="board" class="m-3 board grid text grid-cols-3"></div>
+    </main>
+    <script src="public/javascript/app.js" charset="utf-8"></script>
   </body>
 </html>
