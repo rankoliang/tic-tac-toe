@@ -2,16 +2,33 @@ const board = (size) => {
   const element = document.querySelector("#board");
 
   const getSize = () => size;
+  const pieces = (() => {
+    const pieces = new Array(getSize());
+    for (let i = 0; i < pieces.length; i++) {
+      pieces[i] = new Array(getSize());
+    }
+    return pieces;
+  })();
   const render = () => {
+    while (element.hasChildNodes()) {
+      element.removeChild(element.firstChild);
+    }
+    for (const row of pieces) {
+      for (const piece of row) {
+        element.appendChild(
+          piece.element(currentPlayer, () => {
+            switchPlayer();
+            render();
+          })
+        );
+      }
+    }
+  };
+
+  const resetBoard = () => {
     for (let row = 0; row < getSize(); row++) {
       for (let column = 0; column < getSize(); column++) {
-        let shape;
-        if ((row + column) % 2 == 0) {
-          shape = "cross";
-        } else {
-          shape = "circle";
-        }
-        element.appendChild(piece(shape, ...elementBorders(row, column)));
+        pieces[row][column] = piece(...elementBorders(row, column));
       }
     }
   };
@@ -33,26 +50,59 @@ const board = (size) => {
     return borders;
   };
 
-  return { getSize, element, render };
+  let currentPlayer = 1;
+
+  const switchPlayer = () => {
+    if (currentPlayer === 1) {
+      currentPlayer = 2;
+    } else {
+      currentPlayer = 1;
+    }
+  };
+
+  resetBoard();
+
+  return { getSize, element, render, pieces, switchPlayer, currentPlayer };
 };
 
-const piece = (shape, ...classes) => {
-  const element = elementHelper.piece(
-    svg.element(shape),
-    ...["border-gray-600", "flex", "justify-center", "items-center", "text-6-xl"].concat(classes)
-  );
-  return element;
+const piece = (...classes) => {
+  let player;
+
+  const shape = {
+    1: "cross",
+    2: "circle",
+  };
+
+  const setPlayer = (playerNumber) => {
+    player = playerNumber;
+  };
+
+  const getPlayer = () => player;
+
+  const element = (playerNumber, onClick) => {
+    const playerToken = shape[player] && svg.element(shape[player]);
+    const piece = elementHelper.piece(
+      playerToken,
+      ...["border-gray-600", "flex", "justify-center", "items-center", "text-6-xl"].concat(classes)
+    );
+    if (!player) {
+      piece.addEventListener("click", setPlayer.bind(this, playerNumber));
+      piece.addEventListener("click", onClick);
+    }
+    return piece;
+  };
+  return { element, setPlayer, getPlayer };
 };
 
 const elementHelper = (() => {
   const piece = (img, ...classes) => {
     const element = () => {
       const element = document.createElement("div");
-      element.style.paddingTop = "calc(50% - 1px)";
-      element.style.paddingBottom = "calc(50% - 1px)";
+      element.style.paddingTop = "50%";
+      element.style.paddingBottom = "50%";
       element.style.height = "0px";
       element.classList.add(...classes);
-      element.appendChild(img);
+      img && element.appendChild(img);
 
       return element;
     };
