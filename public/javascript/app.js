@@ -2,35 +2,22 @@ const board = (size) => {
   const element = document.querySelector("#board");
 
   const getSize = () => size;
-  const pieces = (() => {
-    const pieces = new Array(getSize());
+
+  const pieces = new Array(getSize());
+
+  (() => {
     for (let i = 0; i < pieces.length; i++) {
       pieces[i] = new Array(getSize());
     }
-    return pieces;
   })();
-  const render = () => {
-    while (element.hasChildNodes()) {
-      element.removeChild(element.firstChild);
-    }
-    for (const row of pieces) {
-      for (const piece of row) {
-        element.appendChild(
-          piece.element(currentPlayer, () => {
-            switchPlayer();
-            render();
-          })
-        );
-      }
-    }
-  };
 
-  const resetBoard = () => {
+  const reset = function () {
     for (let row = 0; row < getSize(); row++) {
       for (let column = 0; column < getSize(); column++) {
         pieces[row][column] = piece(...elementBorders(row, column));
       }
     }
+    return this;
   };
 
   const elementBorders = (row, column) => {
@@ -60,9 +47,51 @@ const board = (size) => {
     }
   };
 
-  resetBoard();
+  const render = () => {
+    // remove all child nodes
+    while (element.hasChildNodes()) {
+      element.removeChild(element.firstChild);
+    }
+    // render each piece
+    for (const row of pieces) {
+      for (const piece of row) {
+        if (!_checkWinner()) {
+          element.appendChild(
+            piece.element(currentPlayer, () => {
+              {
+                switchPlayer();
+                render();
+              }
+            })
+          );
+        } else {
+          element.appendChild(piece.element());
+        }
+      }
+    }
+  };
 
-  return { getSize, element, render, pieces, switchPlayer, currentPlayer };
+  const _checkWinner = () => {
+    let winner;
+    for (const [, row] of pieces.entries()) {
+      winner = _checkCollection(row);
+      if (winner) {
+        return winner;
+      }
+    }
+    return false;
+  };
+
+  const _checkCollection = (collection) => {
+    const referencePiece = collection[0];
+    if (collection.filter((piece) => piece.getPlayer() === referencePiece.getPlayer()).length === collection.length) {
+      console.log(referencePiece.getPlayer());
+      return referencePiece.getPlayer();
+    }
+    return false;
+  };
+
+  return { getSize, element, render, pieces, switchPlayer, currentPlayer, reset };
 };
 
 const piece = (...classes) => {
@@ -85,7 +114,7 @@ const piece = (...classes) => {
       playerToken,
       ...["border-gray-600", "flex", "justify-center", "items-center", "text-6-xl"].concat(classes)
     );
-    if (!player) {
+    if (!player && onClick) {
       piece.addEventListener("click", setPlayer.bind(this, playerNumber));
       piece.addEventListener("click", onClick);
     }
@@ -152,5 +181,6 @@ const svg = (() => {
 })();
 
 (function () {
-  board(3).render();
+  const tttBoard = board(3).reset();
+  tttBoard.render();
 })();
