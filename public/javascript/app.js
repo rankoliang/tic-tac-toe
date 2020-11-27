@@ -3,13 +3,7 @@ const board = (size) => {
 
   const getSize = () => size;
 
-  const pieces = new Array(getSize());
-
-  (() => {
-    for (let i = 0; i < pieces.length; i++) {
-      pieces[i] = new Array(getSize());
-    }
-  })();
+  const pieces = arrayHelper.multiDimensionalArray(getSize(), getSize());
 
   const reset = function () {
     for (let row = 0; row < getSize(); row++) {
@@ -73,20 +67,11 @@ const board = (size) => {
 
   const _checkWinner = () => {
     let winner;
-    for (const [, row] of pieces.entries()) {
-      winner = _checkCollection(row);
+    for (const row of pieces) {
+      winner = arrayHelper.checkUniformity(row);
       if (winner) {
         return winner;
       }
-    }
-    return false;
-  };
-
-  const _checkCollection = (collection) => {
-    const referencePiece = collection[0];
-    if (collection.filter((piece) => piece.getPlayer() === referencePiece.getPlayer()).length === collection.length) {
-      console.log(referencePiece.getPlayer());
-      return referencePiece.getPlayer();
     }
     return false;
   };
@@ -158,6 +143,41 @@ const elementHelper = (() => {
   return { piece, svg };
 })();
 
+const arrayHelper = (() => {
+  const multiDimensionalArray = (rows, columns) => {
+    const arr = new Array(rows);
+
+    for (let i = 0; i < arr.length; i++) {
+      arr[i] = new Array(columns);
+    }
+    return arr;
+  };
+
+  const checkUniformity = (array) => {
+    const referencePiece = array[0];
+    if (array.filter((piece) => piece.getPlayer() === referencePiece.getPlayer()).length === array.length) {
+      return referencePiece.getPlayer();
+    }
+    return false;
+  };
+
+  const transposeArray = (array) => {
+    const transposedArray = multiDimensionalArray(array[0].length, array.length);
+    for (const [rowIndex, row] of array.entries()) {
+      for (const [columnIndex] of row.entries()) {
+        transposedArray[columnIndex][rowIndex] = array[rowIndex][columnIndex];
+      }
+    }
+    return transposedArray;
+  };
+
+  return {
+    multiDimensionalArray,
+    checkUniformity,
+    transposeArray,
+  };
+})();
+
 const svg = (() => {
   const svgOptions = {
     cross: {
@@ -183,4 +203,13 @@ const svg = (() => {
 (function () {
   const tttBoard = board(3).reset();
   tttBoard.render();
+  const test = [
+    [1, 2],
+    [3, 4],
+    [5, 6],
+  ];
+  console.log(test);
+  console.log(arrayHelper.transposeArray(test));
+  // console.log(tttBoard.pieces);
+  // console.log(arrayHelper.transposeArray(tttBoard.pieces));
 })();
