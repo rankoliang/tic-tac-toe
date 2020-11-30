@@ -1,5 +1,6 @@
 const board = (size) => {
   const element = document.querySelector("#board");
+  element.classList.add(`grid-cols-${size}`);
 
   const getSize = () => size;
 
@@ -46,6 +47,11 @@ const board = (size) => {
     while (element.hasChildNodes()) {
       element.removeChild(element.firstChild);
     }
+
+    if (element.previousSibling.id === "results") {
+      element.previousSibling.remove();
+    }
+
     // render each piece
     const winner = _winner();
     for (const [horizontalIndex, row] of pieces.entries()) {
@@ -63,12 +69,34 @@ const board = (size) => {
           pieceElement = piece.element();
           if (_winningPosition(winner, horizontalIndex, verticalIndex)) {
             // Adds a background to the piece if it is in a winning position
-            pieceElement.classList.add("bg-gray-300");
+            pieceElement.classList.add("bg-gray-200");
           }
         }
         element.appendChild(pieceElement);
       }
     }
+
+    const gameResults = document.createElement("h3");
+    gameResults.classList.add("text-4xl", "text-center", "font-bold", "my-2");
+    gameResults.id = "results";
+    if (winner) {
+      gameResults.textContent = `Player ${winner.player} wins!`;
+      element.insertAdjacentElement("beforebegin", gameResults);
+    } else if (_freeSpaces() === 0) {
+      gameResults.textContent = `Game tied!`;
+      element.insertAdjacentElement("beforebegin", gameResults);
+    }
+  };
+
+  const _freeSpaces = () => {
+    return pieces.reduce(
+      (freeSpaces, row) =>
+        freeSpaces +
+        row.filter((piece) => {
+          return isNaN(piece.getPlayer());
+        }).length,
+      0
+    );
   };
 
   const _winningPosition = (winner, horizontalIndex, verticalIndex) => {
@@ -111,6 +139,8 @@ const board = (size) => {
 
     return false;
   };
+
+  reset();
 
   return { getSize, element, render, pieces, switchPlayer, currentPlayer, reset };
 };
@@ -247,21 +277,16 @@ const svg = (() => {
 })();
 
 (function () {
-  const tttBoard = board(3).reset();
+  const tttBoard = board(3);
   tttBoard.render();
-  const test = [
-    [1, 2],
-    [3, 4],
-    [5, 6],
-  ];
-  console.log(test);
-  console.log(arrayHelper.transposeArray(test));
-  const square = [
-    [1, 2, 3],
-    [4, 5, 6],
-    [7, 8, 9],
-  ];
-  console.log(arrayHelper.diagonals(square));
-  // console.log(tttBoard.pieces);
-  // console.log(arrayHelper.transposeArray(tttBoard.pieces));
+
+  document.getElementById("reset").addEventListener("click", () => {
+    tttBoard.reset();
+    tttBoard.render();
+  });
+
+  //   document.getElementById("play-human").addEventListener("click", () => {
+  //     tttBoard.reset();
+  //     tttBoard.render();
+  //   });
 })();
