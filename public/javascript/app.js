@@ -47,9 +47,10 @@ const board = (size) => {
       element.removeChild(element.firstChild);
     }
     // render each piece
-    for (const row of pieces) {
-      for (const piece of row) {
-        if (!_checkWinner()) {
+    const winner = _winner();
+    for (const [horizontalIndex, row] of pieces.entries()) {
+      for (const [verticalIndex, piece] of row.entries()) {
+        if (!winner) {
           element.appendChild(
             piece.element(currentPlayer, () => {
               {
@@ -59,20 +60,42 @@ const board = (size) => {
             })
           );
         } else {
-          element.appendChild(piece.element());
+          const pieceElement = piece.element();
+          if (
+            (winner.direction == "horizontal" && horizontalIndex == winner.rowIndex) ||
+            (winner.direction == "vertical" && verticalIndex == winner.rowIndex)
+          ) {
+            pieceElement.classList.add("bg-gray-300");
+          }
+          element.appendChild(pieceElement);
         }
       }
     }
+    if (winner) {
+      console.log(winner);
+    }
   };
 
-  const _checkWinner = () => {
-    let winner;
-    for (const row of pieces) {
-      winner = arrayHelper.checkUniformity(row);
-      if (winner) {
-        return winner;
+  const _winner = () => {
+    const rows = {
+      horizontal: pieces,
+      vertical: arrayHelper.transposeArray(pieces),
+      diagonal: arrayHelper.diagonals(pieces),
+    };
+
+    for (const direction of Object.keys(rows)) {
+      for (let i = 0; i < rows[direction].length; i++) {
+        const winningPlayer = arrayHelper.checkUniformity(rows[direction][i]);
+        if (winningPlayer) {
+          return {
+            player: winningPlayer,
+            direction: direction,
+            rowIndex: i,
+          };
+        }
       }
     }
+
     return false;
   };
 
@@ -171,10 +194,20 @@ const arrayHelper = (() => {
     return transposedArray;
   };
 
+  const diagonals = (array) => {
+    const diagonals = multiDimensionalArray(2, array.length);
+    for (let i = 0; i < array.length; i++) {
+      diagonals[0][i] = array[i][i];
+      diagonals[1][i] = array[i][array.length - i - 1];
+    }
+    return diagonals;
+  };
+
   return {
     multiDimensionalArray,
     checkUniformity,
     transposeArray,
+    diagonals,
   };
 })();
 
@@ -210,6 +243,12 @@ const svg = (() => {
   ];
   console.log(test);
   console.log(arrayHelper.transposeArray(test));
+  const square = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9],
+  ];
+  console.log(arrayHelper.diagonals(square));
   // console.log(tttBoard.pieces);
   // console.log(arrayHelper.transposeArray(tttBoard.pieces));
 })();
