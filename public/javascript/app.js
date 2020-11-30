@@ -50,29 +50,42 @@ const board = (size) => {
     const winner = _winner();
     for (const [horizontalIndex, row] of pieces.entries()) {
       for (const [verticalIndex, piece] of row.entries()) {
+        let pieceElement;
         if (!winner) {
-          element.appendChild(
-            piece.element(currentPlayer, () => {
-              {
-                switchPlayer();
-                render();
-              }
-            })
-          );
+          // Adds an event listener to each piece that switches the player and re-renders the board
+          pieceElement = piece.element(currentPlayer, () => {
+            {
+              switchPlayer();
+              render();
+            }
+          });
         } else {
-          const pieceElement = piece.element();
-          if (
-            (winner.direction == "horizontal" && horizontalIndex == winner.rowIndex) ||
-            (winner.direction == "vertical" && verticalIndex == winner.rowIndex)
-          ) {
+          pieceElement = piece.element();
+          if (_winningPosition(winner, horizontalIndex, verticalIndex)) {
+            // Adds a background to the piece if it is in a winning position
             pieceElement.classList.add("bg-gray-300");
           }
-          element.appendChild(pieceElement);
         }
+        element.appendChild(pieceElement);
       }
     }
-    if (winner) {
-      console.log(winner);
+  };
+
+  const _winningPosition = (winner, horizontalIndex, verticalIndex) => {
+    switch (winner.direction) {
+      case "horizontal":
+        return horizontalIndex == winner.rowIndex;
+      case "vertical":
+        return verticalIndex == winner.rowIndex;
+      case "diagonal":
+        if (winner.rowIndex == 0) {
+          return horizontalIndex == verticalIndex;
+        } else if (winner.rowIndex == 1) {
+          return horizontalIndex + verticalIndex == getSize() - 1;
+        }
+        return false;
+      default:
+        return false;
     }
   };
 
