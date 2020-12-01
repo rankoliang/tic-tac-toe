@@ -1,3 +1,7 @@
 div:hover > .hover\:visible {
   visibility: visible;
 }
+
+.grid {
+  grid-template-columns: repeat(var(--grid-cols), minmax(0, 1fr) )
+}

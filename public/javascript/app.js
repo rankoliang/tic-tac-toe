@@ -1,6 +1,6 @@
 const game = (size) => {
   const element = document.querySelector("#board");
-  element.classList.add(`grid-cols-${size}`);
+  element.style.setProperty("--grid-cols", size)
 
   const getSize = () => size;
 
@@ -18,7 +18,9 @@ const game = (size) => {
 
   const reset = function () {
     players = [];
+    // purgecss: text-blue-500 text-blue-300
     players.push(player(1, "blue"));
+    // purgecss: text-yellow-500 text-yellow-300
     players.push(player(2, "yellow"));
     for (let row = 0; row < getSize(); row++) {
       for (let column = 0; column < getSize(); column++) {
@@ -86,7 +88,7 @@ const game = (size) => {
       gameResults.textContent = `${winner.player.getName()} wins!`;
       element.insertAdjacentElement("beforebegin", gameResults);
     } else if (_freeSpaces() === 0) {
-      gameResults.textContent = `Game tied!`;
+      gameResults.textContent = "Game tied!";
       element.insertAdjacentElement("beforebegin", gameResults);
     }
   };
