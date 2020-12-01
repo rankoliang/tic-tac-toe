@@ -18,8 +18,8 @@ const game = (size) => {
 
   const reset = function () {
     players = [];
-    players.push(player(1));
-    players.push(player(2));
+    players.push(player(1, "blue"));
+    players.push(player(2, "yellow"));
     for (let row = 0; row < getSize(); row++) {
       for (let column = 0; column < getSize(); column++) {
         board[row][column] = piece(...elementBorders(row, column));
@@ -148,7 +148,7 @@ const game = (size) => {
   return { getSize, element, render, pieces: board, switchPlayer, currentPlayer, reset };
 };
 
-const player = (number, name) => {
+const player = (number, color, name) => {
   name = name || `Player ${number}`;
 
   const shape = {
@@ -157,10 +157,14 @@ const player = (number, name) => {
   };
 
   const marker = () => {
-    return svg.element(shape[number] || 1);
+    return svg.element(shape[number] || 1, `text-${color}-500`);
   };
 
-  return { number, name, marker };
+  const hoverMarker = () => {
+    return svg.element(shape[number] || 1, "invisible", "hover:visible", `text-${color}-300`);
+  };
+
+  return { number, name, marker, hoverMarker };
 };
 
 const piece = (...classes) => {
@@ -178,6 +182,8 @@ const piece = (...classes) => {
     );
     if (piecePlayer) {
       piece.appendChild(piecePlayer.marker());
+    } else if (player) {
+      piece.appendChild(player.hoverMarker());
     }
     if (!piecePlayer && onClick) {
       piece.addEventListener("click", setPlayer.bind(this, player));
@@ -273,12 +279,12 @@ const svg = (() => {
       path:
         "M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z",
       styles: { width: "100%" },
-      classes: ["text-blue-500"],
+      classes: [],
     },
     circle: {
       path: "M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z",
-      styles: { width: "50%" },
-      classes: ["text-yellow-500"],
+      styles: { width: "100%" },
+      classes: ["p-16"],
     },
   };
 

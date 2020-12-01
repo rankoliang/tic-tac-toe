@@ -2,3 +2,7 @@
   flex-basis: 100%;
   height: 0;
 }
+
+div:hover > .hover\:visible {
+  visibility: visible;
+}
