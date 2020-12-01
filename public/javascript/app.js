@@ -1,10 +1,10 @@
-const board = (size) => {
+const game = (size) => {
   const element = document.querySelector("#board");
   element.classList.add(`grid-cols-${size}`);
 
   const getSize = () => size;
 
-  const pieces = arrayHelper.multiDimensionalArray(getSize(), getSize());
+  const board = arrayHelper.multiDimensionalArray(getSize(), getSize());
 
   let players;
 
@@ -22,7 +22,7 @@ const board = (size) => {
     players.push(player(2));
     for (let row = 0; row < getSize(); row++) {
       for (let column = 0; column < getSize(); column++) {
-        pieces[row][column] = piece(...elementBorders(row, column));
+        board[row][column] = piece(...elementBorders(row, column));
       }
     }
     return this;
@@ -57,7 +57,7 @@ const board = (size) => {
 
     // render each piece
     const winner = _winner();
-    for (const [horizontalIndex, row] of pieces.entries()) {
+    for (const [horizontalIndex, row] of board.entries()) {
       for (const [verticalIndex, piece] of row.entries()) {
         let pieceElement;
         if (!winner) {
@@ -92,7 +92,7 @@ const board = (size) => {
   };
 
   const _freeSpaces = () => {
-    return pieces.reduce(
+    return board.reduce(
       (freeSpaces, row) =>
         freeSpaces +
         row.filter((piece) => {
@@ -122,9 +122,9 @@ const board = (size) => {
 
   const _winner = () => {
     const rows = {
-      horizontal: pieces,
-      vertical: arrayHelper.transposeArray(pieces),
-      diagonal: arrayHelper.diagonals(pieces),
+      horizontal: board,
+      vertical: arrayHelper.transposeArray(board),
+      diagonal: arrayHelper.diagonals(board),
     };
 
     for (const direction of Object.keys(rows)) {
@@ -145,7 +145,7 @@ const board = (size) => {
 
   reset();
 
-  return { getSize, element, render, pieces, switchPlayer, currentPlayer, reset };
+  return { getSize, element, render, pieces: board, switchPlayer, currentPlayer, reset };
 };
 
 const player = (number, name) => {
@@ -290,7 +290,7 @@ const svg = (() => {
 })();
 
 (function () {
-  const tttBoard = board(3);
+  const tttBoard = game(3);
   tttBoard.render();
 
   document.getElementById("reset").addEventListener("click", () => {
