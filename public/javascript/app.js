@@ -6,7 +6,20 @@ const board = (size) => {
 
   const pieces = arrayHelper.multiDimensionalArray(getSize(), getSize());
 
+  let players;
+
+  const currentPlayer = () => {
+    return players[0];
+  };
+
+  const switchPlayer = () => {
+    players.push(players.shift());
+  };
+
   const reset = function () {
+    players = [];
+    players.push(player(1));
+    players.push(player(2));
     for (let row = 0; row < getSize(); row++) {
       for (let column = 0; column < getSize(); column++) {
         pieces[row][column] = piece(...elementBorders(row, column));
@@ -32,16 +45,6 @@ const board = (size) => {
     return borders;
   };
 
-  let currentPlayer = 1;
-
-  const switchPlayer = () => {
-    if (currentPlayer === 1) {
-      currentPlayer = 2;
-    } else {
-      currentPlayer = 1;
-    }
-  };
-
   const render = () => {
     // remove all child nodes
     while (element.hasChildNodes()) {
@@ -59,7 +62,7 @@ const board = (size) => {
         let pieceElement;
         if (!winner) {
           // Adds an event listener to each piece that switches the player and re-renders the board
-          pieceElement = piece.element(currentPlayer, () => {
+          pieceElement = piece.element(currentPlayer(), () => {
             {
               switchPlayer();
               render();
@@ -80,7 +83,7 @@ const board = (size) => {
     gameResults.classList.add("text-4xl", "text-center", "font-bold", "my-2");
     gameResults.id = "results";
     if (winner) {
-      gameResults.textContent = `Player ${winner.player} wins!`;
+      gameResults.textContent = `Player ${winner.player.number} wins!`;
       element.insertAdjacentElement("beforebegin", gameResults);
     } else if (_freeSpaces() === 0) {
       gameResults.textContent = `Game tied!`;
@@ -93,7 +96,7 @@ const board = (size) => {
       (freeSpaces, row) =>
         freeSpaces +
         row.filter((piece) => {
-          return isNaN(piece.getPlayer());
+          return !piece.getPlayer();
         }).length,
       0
     );
@@ -126,7 +129,7 @@ const board = (size) => {
 
     for (const direction of Object.keys(rows)) {
       for (let i = 0; i < rows[direction].length; i++) {
-        const winningPlayer = arrayHelper.checkUniformity(rows[direction][i]);
+        const winningPlayer = arrayHelper.checkUniformity(rows[direction][i], "getPlayer");
         if (winningPlayer) {
           return {
             player: winningPlayer,
@@ -145,28 +148,39 @@ const board = (size) => {
   return { getSize, element, render, pieces, switchPlayer, currentPlayer, reset };
 };
 
-const piece = (...classes) => {
-  let player;
+const player = (number, name) => {
+  name = name || `Player ${number}`;
 
   const shape = {
     1: "cross",
     2: "circle",
   };
 
-  const setPlayer = (playerNumber) => {
-    player = playerNumber;
+  const marker = () => {
+    return svg.element(shape[number] || 1);
   };
 
-  const getPlayer = () => player;
+  return { number, name, marker };
+};
 
-  const element = (playerNumber, onClick) => {
-    const playerToken = shape[player] && svg.element(shape[player]);
+const piece = (...classes) => {
+  let piecePlayer;
+
+  const setPlayer = (player) => {
+    piecePlayer = player;
+  };
+
+  const getPlayer = () => piecePlayer;
+
+  const element = (player, onClick) => {
     const piece = elementHelper.piece(
-      playerToken,
       ...["border-gray-600", "flex", "justify-center", "items-center", "text-6-xl"].concat(classes)
     );
-    if (!player && onClick) {
-      piece.addEventListener("click", setPlayer.bind(this, playerNumber));
+    if (piecePlayer) {
+      piece.appendChild(piecePlayer.marker());
+    }
+    if (!piecePlayer && onClick) {
+      piece.addEventListener("click", setPlayer.bind(this, player));
       piece.addEventListener("click", onClick);
     }
     return piece;
@@ -175,14 +189,13 @@ const piece = (...classes) => {
 };
 
 const elementHelper = (() => {
-  const piece = (img, ...classes) => {
+  const piece = (...classes) => {
     const element = () => {
       const element = document.createElement("div");
       element.style.paddingTop = "50%";
       element.style.paddingBottom = "50%";
       element.style.height = "0px";
       element.classList.add(...classes);
-      img && element.appendChild(img);
 
       return element;
     };
@@ -219,10 +232,10 @@ const arrayHelper = (() => {
     return arr;
   };
 
-  const checkUniformity = (array) => {
-    const referencePiece = array[0];
-    if (array.filter((piece) => piece.getPlayer() === referencePiece.getPlayer()).length === array.length) {
-      return referencePiece.getPlayer();
+  const checkUniformity = (array, getter) => {
+    const referenceElement = array[0];
+    if (array.filter((element) => element[getter]() === referenceElement[getter]()).length === array.length) {
+      return referenceElement[getter]();
     }
     return false;
   };
