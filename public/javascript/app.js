@@ -1,6 +1,6 @@
 const game = (size) => {
   const element = document.querySelector("#board");
-  element.style.setProperty("--grid-cols", size)
+  element.style.setProperty("--grid-cols", size);
 
   const getSize = () => size;
 
@@ -15,6 +15,9 @@ const game = (size) => {
   const switchPlayer = () => {
     players.push(players.shift());
   };
+
+  const getPlayers = () => players;
+  const setPlayers = (value) => (players = value);
 
   const reset = function () {
     players = [];
@@ -147,14 +150,14 @@ const game = (size) => {
 
   reset();
 
-  return { getSize, element, render, pieces: board, switchPlayer, currentPlayer, reset };
+  return { getSize, element, render, board, switchPlayer, currentPlayer, reset, getPlayers, setPlayers };
 };
 
 const player = (number, color) => {
   const nameInput = document.getElementById(`player-${number}-name`);
 
   const getName = () => {
-    return nameInput.value || `Player ${number}`;
+    return nameInput.value || nameInput.placeholder || `Player ${number}`;
   };
 
   const shape = {
@@ -182,6 +185,8 @@ const piece = (...classes) => {
 
   const getPlayer = () => piecePlayer;
 
+  const getClasses = () => classes;
+
   const element = (player, onClick) => {
     const piece = elementHelper.piece(
       ...["border-gray-600", "flex", "justify-center", "items-center", "text-6-xl"].concat(classes)
@@ -197,7 +202,7 @@ const piece = (...classes) => {
     }
     return piece;
   };
-  return { element, setPlayer, getPlayer };
+  return { element, setPlayer, getPlayer, getClasses };
 };
 
 const elementHelper = (() => {
@@ -301,6 +306,27 @@ const svg = (() => {
   return { element };
 })();
 
+const deep_cloner = (() => {
+  const clonedPiece = (sourcePiece) => {
+    const newPiece = piece(sourcePiece.classes);
+    newPiece.setPlayer(sourcePiece);
+    return newPiece;
+  };
+
+  const clonedGame = (sourceGame) => {
+    const newGame = game(sourceGame.getSize());
+    newGame.board = clonedBoard(sourceGame.board);
+    newGame.setPlayers(sourceGame.getPlayers().map((player) => player));
+    return newGame;
+  };
+
+  const clonedBoard = (board) => {
+    return board.map((row) => row.map((piece) => clonedPiece(piece)));
+  };
+
+  return { piece: clonedPiece, game: clonedGame, board: clonedBoard };
+})();
+
 (function () {
   const tttBoard = game(3);
   tttBoard.render();
@@ -309,9 +335,4 @@ const svg = (() => {
     tttBoard.reset();
     tttBoard.render();
   });
-
-  //   document.getElementById("play-human").addEventListener("click", () => {
-  //     tttBoard.reset();
-  //     tttBoard.render();
-  //   });
 })();
