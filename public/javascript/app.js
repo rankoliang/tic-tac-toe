@@ -96,15 +96,22 @@ const game = (size) => {
     }
   };
 
+  const _availableMoves = () => {
+    return board
+      .map((row, rowIndex) => {
+        return row
+          .map((piece, columnIndex) => {
+            if (!piece.getPlayer()) {
+              return [rowIndex, columnIndex];
+            }
+          })
+          .filter((indices) => indices !== undefined);
+      })
+      .flat();
+  };
+
   const _freeSpaces = () => {
-    return board.reduce(
-      (freeSpaces, row) =>
-        freeSpaces +
-        row.filter((piece) => {
-          return !piece.getPlayer();
-        }).length,
-      0
-    );
+    return _availableMoves().length;
   };
 
   const _winningPosition = (winner, horizontalIndex, verticalIndex) => {
