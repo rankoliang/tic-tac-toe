@@ -5,4 +5,8 @@
   @apply px-2 py-1 mx-2 my-1 text-lg font-bold tracking-wide text-white uppercase shadow-2xl rounded-md focus:outline-none;
 }
 
+input[type="text"] {
+  @apply w-48 text-xl px-2 py-1 my-2 text-center text-gray-700 border border-gray-500 rounded-sm shadow-sm md:py-2 md:text-2xl
+}
+
 @tailwind utilities;

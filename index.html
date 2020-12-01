@@ -11,11 +11,26 @@
     <header class="py-4 text-center bg-gray-700 shadow-md">
       <h1 class="text-4xl font-semibold text-gray-100 sm:text-6xl">Tic Tac Toe</h1>
     </header>
-    <div class="flex flex-wrap justify-center my-2">
-      <!-- <button class="bg-green-600 hover:bg-green-800 btn focus:bg-green-800" id="play-human">VS Human</button> -->
-      <!-- <button class="bg-blue-500 btn hover:bg-blue-700 focus:bg-blue-700" id="play-cpu">VS CPU</button> -->
-      <!-- <div class="break"></div> -->
+    <div class="flex flex-wrap items-center justify-around max-w-4xl m-auto mt-6">
+      <div>
+        <label for="player-1-name" class="hidden">Player 1 Name</label>
+        <input
+          type="text"
+          placeholder="Player 1"
+          name="player-1-name"
+          id="player-1-name"
+        />
+      </div>
       <button class="bg-red-600 btn hover:bg-red-700 focus:bg-red-700" id="reset">Reset</button>
+      <div>
+        <label for="player-2-name" class="hidden">Player 2 Name</label>
+        <input
+          type="text"
+          placeholder="Player 2"
+          name="player-2-name"
+          id="player-2-name"
+        />
+      </div>
     </div>
     <main class="m-10">
       <div id="board" class="max-w-4xl m-auto board grid"></div>

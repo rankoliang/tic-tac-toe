@@ -83,7 +83,7 @@ const game = (size) => {
     gameResults.classList.add("text-4xl", "text-center", "font-bold", "my-2");
     gameResults.id = "results";
     if (winner) {
-      gameResults.textContent = `Player ${winner.player.number} wins!`;
+      gameResults.textContent = `${winner.player.getName()} wins!`;
       element.insertAdjacentElement("beforebegin", gameResults);
     } else if (_freeSpaces() === 0) {
       gameResults.textContent = `Game tied!`;
@@ -148,8 +148,12 @@ const game = (size) => {
   return { getSize, element, render, pieces: board, switchPlayer, currentPlayer, reset };
 };
 
-const player = (number, color, name) => {
-  name = name || `Player ${number}`;
+const player = (number, color) => {
+  const nameInput = document.getElementById(`player-${number}-name`);
+
+  const getName = () => {
+    return nameInput.value || `Player ${number}`;
+  };
 
   const shape = {
     1: "cross",
@@ -164,7 +168,7 @@ const player = (number, color, name) => {
     return svg.element(shape[number] || 1, "invisible", "hover:visible", `text-${color}-300`);
   };
 
-  return { number, name, marker, hoverMarker };
+  return { number, getName, marker, hoverMarker };
 };
 
 const piece = (...classes) => {
@@ -283,8 +287,8 @@ const svg = (() => {
     },
     circle: {
       path: "M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z",
-      styles: { width: "100%" },
-      classes: ["p-16"],
+      styles: { width: "50%" },
+      classes: [],
     },
   };
 
