@@ -14,26 +14,19 @@
     <div class="flex flex-wrap items-center justify-around max-w-4xl m-auto mt-6">
       <div>
         <label for="player-1-name" class="hidden">Player 1 Name</label>
-        <input
-          type="text"
-          placeholder="Player 1"
-          name="player-1-name"
-          id="player-1-name"
-        />
+        <input type="text" placeholder="Player 1" name="player-1-name" id="player-1-name" />
       </div>
-      <button class="bg-red-600 btn hover:bg-red-700 focus:bg-red-700" id="reset">Reset</button>
+      <div>
+        <input type="number" min="3" max="9" value="3" id="grid-size" />
+        <button class="bg-red-600 btn hover:bg-red-700 focus:bg-red-700" id="reset">Reset</button>
+      </div>
       <div>
         <label for="player-2-name" class="hidden">Player 2 Name</label>
-        <input
-          type="text"
-          placeholder="Player 2"
-          name="player-2-name"
-          id="player-2-name"
-        />
+        <input type="text" placeholder="Player 2" name="player-2-name" id="player-2-name" />
       </div>
     </div>
     <main class="m-10">
-      <div id="board" class="max-w-4xl m-auto board grid"></div>
+      <div id="board" class="max-w-xl m-auto board grid"></div>
     </main>
     <script src="public/javascript/app.js" charset="utf-8"></script>
   </body>

@@ -1,10 +1,9 @@
-const game = (size) => {
+const game = () => {
+  let size;
+  let board;
   const element = document.querySelector("#board");
-  element.style.setProperty("--grid-cols", size);
 
   const getSize = () => size;
-
-  const board = arrayHelper.multiDimensionalArray(getSize(), getSize());
 
   let players;
 
@@ -20,6 +19,9 @@ const game = (size) => {
   const setPlayers = (value) => (players = value);
 
   const reset = function () {
+    size = Number(document.getElementById("grid-size").value);
+    element.style.setProperty("--grid-cols", getSize());
+    board = arrayHelper.multiDimensionalArray(getSize(), getSize());
     players = [];
     // purgecss: text-blue-500 text-blue-300
     players.push(player(1, "blue"));
@@ -311,27 +313,6 @@ const svg = (() => {
     return elementHelper.svg(shapeOptions.path, shapeOptions.styles, ...shapeOptions.classes.concat(classes));
   };
   return { element };
-})();
-
-const deep_cloner = (() => {
-  const clonedPiece = (sourcePiece) => {
-    const newPiece = piece(sourcePiece.classes);
-    newPiece.setPlayer(sourcePiece);
-    return newPiece;
-  };
-
-  const clonedGame = (sourceGame) => {
-    const newGame = game(sourceGame.getSize());
-    newGame.board = clonedBoard(sourceGame.board);
-    newGame.setPlayers(sourceGame.getPlayers().map((player) => player));
-    return newGame;
-  };
-
-  const clonedBoard = (board) => {
-    return board.map((row) => row.map((piece) => clonedPiece(piece)));
-  };
-
-  return { piece: clonedPiece, game: clonedGame, board: clonedBoard };
 })();
 
 (function () {
