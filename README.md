@@ -1,6 +1,6 @@
 # Tic Tac Toe
 
-This is a simple Tic Tac Toe project. Try it out [here](https://rankoliang.github.io/tic-tac-toe).
+This is a simple Tic Tac Toe project. Try it out [here](https://rankoliang.github.io/tic-tac-toe/).
 
 ## Running Locally
 
